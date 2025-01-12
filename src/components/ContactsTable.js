@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../api/api";
-import EditContactForm from "./forms/EditContactForm";
-import AddContactForm from "./forms/AddContactForm";
+import EditContactForm from "../forms/EditContactForm";
+import AddContactForm from "../forms/AddContactForm";
 
 const ContactsTable = () => {
   const [contacts, setContacts] = useState([]);

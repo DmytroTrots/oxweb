@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import EditClientForm from "./forms/EditClientForm";
+import EditClientForm from "../forms/EditClientForm";
 import { api } from "../api/api";
 import { useAuth } from "../context/AuthContext";
-import ContactsTable from "./ContactsTable";
-import TasksTable from "./TasksTable";
-import Notifications from "../webSocket/Notifications";
+import ContactsTable from "../components/ContactsTable";
+import TasksTable from "../components/TasksTable";
 
 const AdminPage = () => {
   const [activeSection, setActiveSection] = useState("clientName");
@@ -46,7 +45,7 @@ const AdminPage = () => {
   return (
           <div>
             <nav style={{ display: "flex", gap: "20px", padding: "10px", borderBottom: "1px solid #ccc" }}>
-              <button onClick={() => setActiveSection("clientName")}>Client Name</button>
+              <button onClick={() => setActiveSection("clientName")}>Client</button>
               <button onClick={() => setActiveSection("contacts")}>Contacts</button>
               <button onClick={() => setActiveSection("tasks")}>Tasks</button>
             </nav>
@@ -54,8 +53,6 @@ const AdminPage = () => {
             <div style={{ marginTop: "20px" }}>
               {renderContent()}
             </div>
-
-            <Notifications userId={user?.id}></Notifications>
           </div>
   );
 };

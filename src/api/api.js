@@ -13,7 +13,10 @@ export const api = {
   getTasksByClientId,
   deleteTaskById,
   createTask,
-  updateTask
+  updateTask,
+  createClient,
+  getContactByUserId,
+  getClientById
 }
 
 function authenticate(username, password) {
@@ -27,9 +30,25 @@ function getClientByUserId(user) {
   return instance.get(url, {headers: {'Authorization': basicAuth(user)}})
 }
 
+function getClientById(user, contact) {
+  const url = "/api/v_0/client/" + contact.clientId;
+  return instance.get(url, {headers: {'Authorization': basicAuth(user)}})
+}
+
+function createClient(client) {
+  return instance.post('/public/api/v_0/client', client, {
+    headers: { 'Content-type': 'application/json' }
+  })
+}
+
 function updateClient(user, clientData) {
   const url = "/api/v_0/client";
   return instance.put(url, clientData, {headers: {'Authorization': basicAuth(user)}});
+}
+
+function getContactByUserId(user) {
+  const url = "/api/v_0/contact/user/" + user.id;
+  return instance.get(url, {headers: {'Authorization': basicAuth(user)}})
 }
 
 function updateContact(user, contactData) {
@@ -77,5 +96,5 @@ const instance = axios.create({
 })
 
 function basicAuth(user) {
-  return `Basic ${user.authdata}`
+  return `Bearer ${user.token}`
 }

@@ -1,67 +1,67 @@
 import { useEffect, useState } from "react";
-import { api } from "../../api/api";
-import { useAuth } from "../../context/AuthContext";
+import { api } from "../api/api";
+import { useAuth } from "../context/AuthContext";
 
-const EditContactForm = ({selectedContact, onUpdate, onClose}) => {
+const EditClientForm = () => {
 
-  const [contact, setContact] = useState(null);
+  const [client, setClient] = useState(null);
 
   const auth = useAuth();
   const user = auth.getUser();
 
   useEffect(() => {
-    setContact(selectedContact)
-  }, []);
-
+    setClient(auth.getClient())
+  }, [ localStorage.getItem("client") ]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setContact((prev) => ({ ...prev, [name]: value }));
+    setClient((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const updatedContact = await api.updateContact(user, contact);
-      onUpdate(updatedContact?.data);
-      alert("Contact updated successfully!");
+      const updatedClient = await api.updateClient(user, client);
+      setClient(updatedClient?.data);
+      auth.setClientData(updatedClient?.data);
+      alert("Client updated successfully!");
     } catch (err) {
-      alert("Failed to update contact");
+      alert("Failed to update client");
     }
   };
 
-  return (contact &&
+  return (client?.id &&
           <form onSubmit={handleUpdate}>
-            <h2>Edit Contact</h2>
+            <h2>Edit Client</h2>
             <div>
               <label>
-                First Name:
+                Company Name:
                 <input
                         type="text"
-                        name="firstName"
-                        value={contact?.firstName}
+                        name="companyName"
+                        value={client?.companyName}
                         onChange={handleChange}
                 />
               </label>
             </div>
             <div>
               <label>
-                Last Name:
+                Industry:
                 <input
                         type="text"
-                        name="lastName"
-                        value={contact?.lastName}
+                        name="industry"
+                        value={client?.industry}
                         onChange={handleChange}
                 />
               </label>
             </div>
             <div>
               <label>
-                Phone:
+                Address:
                 <input
                         type="text"
-                        name="phone"
-                        value={contact?.phone}
+                        name="address"
+                        value={client?.address}
                         onChange={handleChange}
                 />
               </label>
@@ -72,15 +72,14 @@ const EditContactForm = ({selectedContact, onUpdate, onClose}) => {
                 <input
                         type="email"
                         name="user.email"
-                        value={contact?.email}
+                        value={client?.user?.email}
                         disabled
                 />
               </label>
             </div>
             <button type="submit">Save</button>
-            <button type="button" onClick={onClose}>Close</button>
           </form>
   );
 };
 
-export default EditContactForm;
+export default EditClientForm;

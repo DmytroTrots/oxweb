@@ -1,6 +1,6 @@
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import { api } from "../../api/api";
+import { api } from "../api/api";
 
 const AddContactForm = ({ onAdd }) => {
   const [contact, setContact] = useState({

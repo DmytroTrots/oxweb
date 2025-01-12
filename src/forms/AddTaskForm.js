@@ -1,6 +1,6 @@
+import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
-import { api } from "../../api/api";
-import { useAuth } from "../../context/AuthContext";
+import { api } from "../api/api";
 
 const formatDate = (date) => {
   const d = new Date(date);
@@ -10,16 +10,15 @@ const formatDate = (date) => {
   return `${day}-${month}-${year}`;
 };
 
-const EditTaskForm = ({selectedTask, onUpdate, onClose}) => {
-
-  const [task, setTask] = useState(null);
+const AddTaskForm = ({ onAdd }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [contacts, setContacts] = useState([]);
-
-  const auth = useAuth();
-  const user = auth.getUser();
-  const client = auth.getClient();
+  const [task, setTask] = useState({
+                                           description: "",
+                                           deadlineTime: "",
+                                           contactId: ""
+  });
 
   const fetchContactsData = async () => {
     try {
@@ -34,9 +33,11 @@ const EditTaskForm = ({selectedTask, onUpdate, onClose}) => {
 
   useEffect(() => {
     fetchContactsData();
-    setTask(selectedTask)
   }, []);
 
+  const auth = useAuth();
+  const user = auth.getUser();
+  const client = auth.getClient();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,27 +48,27 @@ const EditTaskForm = ({selectedTask, onUpdate, onClose}) => {
     setTask((prev) => ({ ...prev, [name]: formattedValue }));
   };
 
-  const handleUpdate = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updatedTask = await api.updateTask(user, task);
-      onUpdate(updatedTask?.data);
-      alert("Task updated successfully!");
+      const newTask = await api.createTask(user, task);
+      onAdd(newTask?.data);
+      alert("Task added successfully!");
     } catch (err) {
-      alert("Failed to update task");
+      alert("Failed to add task");
     }
   };
 
-  return (task &&
-          <form onSubmit={handleUpdate}>
-            <h2>Edit Task</h2>
+  return (
+          <form onSubmit={handleSubmit}>
+            <h2>Add Task</h2>
             <div>
               <label>
                 Description:
                 <input
                         type="text"
                         name="description"
-                        value={task?.description}
+                        value={task.description}
                         onChange={handleChange}
                 />
               </label>
@@ -78,7 +79,7 @@ const EditTaskForm = ({selectedTask, onUpdate, onClose}) => {
                 <input
                         type="date"
                         name="deadlineTime"
-                        value={task?.deadlineTime}
+                        value={task.deadlineTime}
                         onChange={handleChange}
                 />
               </label>
@@ -93,7 +94,7 @@ const EditTaskForm = ({selectedTask, onUpdate, onClose}) => {
                 ) : (
                         <select
                                 name="contactId"
-                                value={task?.contactId}
+                                value={task.contactId}
                                 onChange={handleChange}
                         >
                           <option value="">Select Contact</option>
@@ -106,23 +107,9 @@ const EditTaskForm = ({selectedTask, onUpdate, onClose}) => {
                 )}
               </label>
             </div>
-            <div>
-              <label>
-                Status:
-                <select
-                        name="status"
-                        value={task?.status}
-                        onChange={handleChange}>
-                  <option value="OPEN">OPEN</option>
-                  <option value="IN_PROGRESS">IN_PROGRESS</option>
-                  <option value="DONE">DONE</option>
-                </select>
-              </label>
-            </div>
-            <button type="submit">Save</button>
-            <button type="button" onClick={onClose}>Close</button>
+            <button type="submit">Add</button>
           </form>
   );
 };
 
-export default EditTaskForm;
+export default AddTaskForm;

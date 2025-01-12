@@ -6,6 +6,7 @@ import Login from "./components/Login";
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import UserPage from "./user/UserPage";
+import Signup from "./components/Signup";
 
 const App = () => {
 
@@ -15,7 +16,7 @@ const App = () => {
               <Navbar />
               <Routes>
                 <Route path='/login' element={<Login />} />
-                {/*<Route path='/signup' element={<Signup />} />*/}
+                <Route path='/signup' element={<Signup />} />
                 <Route path="/adminpage" element={<PrivateRoute><AdminPage /></PrivateRoute>} />
                 <Route path="/userpage" element={<PrivateRoute><UserPage /></PrivateRoute>} />
                 <Route path="*" element={<Navigate to="/" />} />

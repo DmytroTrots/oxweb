@@ -1,6 +1,6 @@
-import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
-import { api } from "../../api/api";
+import { api } from "../api/api";
+import { useAuth } from "../context/AuthContext";
 
 const formatDate = (date) => {
   const d = new Date(date);
@@ -10,15 +10,16 @@ const formatDate = (date) => {
   return `${day}-${month}-${year}`;
 };
 
-const AddTaskForm = ({ onAdd }) => {
+const EditTaskForm = ({selectedTask, onUpdate, onClose}) => {
+
+  const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [contacts, setContacts] = useState([]);
-  const [task, setTask] = useState({
-                                           description: "",
-                                           deadlineTime: "",
-                                           contactId: ""
-  });
+
+  const auth = useAuth();
+  const user = auth.getUser();
+  const client = auth.getClient();
 
   const fetchContactsData = async () => {
     try {
@@ -33,11 +34,9 @@ const AddTaskForm = ({ onAdd }) => {
 
   useEffect(() => {
     fetchContactsData();
+    setTask(selectedTask)
   }, []);
 
-  const auth = useAuth();
-  const user = auth.getUser();
-  const client = auth.getClient();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,27 +47,27 @@ const AddTaskForm = ({ onAdd }) => {
     setTask((prev) => ({ ...prev, [name]: formattedValue }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const newTask = await api.createTask(user, task);
-      onAdd(newTask?.data);
-      alert("Task added successfully!");
+      const updatedTask = await api.updateTask(user, task);
+      onUpdate(updatedTask?.data);
+      alert("Task updated successfully!");
     } catch (err) {
-      alert("Failed to add task");
+      alert("Failed to update task");
     }
   };
 
-  return (
-          <form onSubmit={handleSubmit}>
-            <h2>Add Task</h2>
+  return (task &&
+          <form onSubmit={handleUpdate}>
+            <h2>Edit Task</h2>
             <div>
               <label>
                 Description:
                 <input
                         type="text"
                         name="description"
-                        value={task.description}
+                        value={task?.description}
                         onChange={handleChange}
                 />
               </label>
@@ -79,7 +78,7 @@ const AddTaskForm = ({ onAdd }) => {
                 <input
                         type="date"
                         name="deadlineTime"
-                        value={task.deadlineTime}
+                        value={task?.deadlineTime}
                         onChange={handleChange}
                 />
               </label>
@@ -94,7 +93,7 @@ const AddTaskForm = ({ onAdd }) => {
                 ) : (
                         <select
                                 name="contactId"
-                                value={task.contactId}
+                                value={task?.contactId}
                                 onChange={handleChange}
                         >
                           <option value="">Select Contact</option>
@@ -107,9 +106,23 @@ const AddTaskForm = ({ onAdd }) => {
                 )}
               </label>
             </div>
-            <button type="submit">Add</button>
+            <div>
+              <label>
+                Status:
+                <select
+                        name="status"
+                        value={task?.status}
+                        onChange={handleChange}>
+                  <option value="OPEN">OPEN</option>
+                  <option value="IN_PROGRESS">IN_PROGRESS</option>
+                  <option value="DONE">DONE</option>
+                </select>
+              </label>
+            </div>
+            <button type="submit">Save</button>
+            <button type="button" onClick={onClose}>Close</button>
           </form>
   );
 };
 
-export default AddTaskForm;
+export default EditTaskForm;

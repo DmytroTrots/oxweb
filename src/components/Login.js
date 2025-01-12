@@ -30,9 +30,8 @@ function Login() {
 
     try {
       const response = await api.authenticate(username, password)
-      const { id, name, role } = response.data
-      const authdata = window.btoa(username + ':' + password)
-      const authenticatedUser = { id, name, role, authdata }
+      const { id, name, role, token } = response.data
+      const authenticatedUser = { id, name, role, token }
 
       Auth.userLogin(authenticatedUser)
 

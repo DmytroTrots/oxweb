@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../api/api";
-import AddTaskForm from "./forms/AddTaskForm";
-import EditTaskForm from "./forms/EditTaskForm";
+import AddTaskForm from "../forms/AddTaskForm";
+import EditTaskForm from "../forms/EditTaskForm";
 
 const TasksTable = () => {
   const [tasks, setTasks] = useState([]);
@@ -14,6 +14,8 @@ const TasksTable = () => {
   const auth = useAuth();
   const user = auth.getUser();
   const client = auth.getClient();
+
+  const hasAllPermissions = user.role.includes("ADMIN");
 
   const fetchTaskData = async () => {
     try {
@@ -75,7 +77,7 @@ const TasksTable = () => {
           <div style={{ display: "flex", alignItems: "flex-start" }}>
             <div>
               <h2>Tasks</h2>
-              <button onClick={handleAddTask} style={{ marginBottom: "10px" }}>
+              <button onClick={handleAddTask} style={{ marginBottom: "10px" }} disabled={!hasAllPermissions} >
                 Add Task
               </button>
               <table
@@ -86,6 +88,7 @@ const TasksTable = () => {
                 <thead>
                 <tr>
                   <th>Task Description</th>
+                  <th>Assignee</th>
                   <th>Action</th>
                 </tr>
                 </thead>
@@ -98,8 +101,9 @@ const TasksTable = () => {
                           >
                             {task.description}
                           </td>
+                          <td>{task.contactFirstName} {task.contactLastName}</td>
                           <td>
-                            <button onClick={() => handleDeleteTask(task.id)}>
+                            <button onClick={() => handleDeleteTask(task.id)} disabled={!hasAllPermissions}>
                               Delete
                             </button>
                           </td>
@@ -126,7 +130,7 @@ const TasksTable = () => {
                     </div>
             )}
 
-            {showAddTaskForm && (
+            {hasAllPermissions && showAddTaskForm && (
                     <div
                             style={{
                               border: "1px solid #ccc",
